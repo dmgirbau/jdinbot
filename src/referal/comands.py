@@ -7,6 +7,7 @@ conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
 cursor = conn.cursor()
 REFERRAL_BONUS = 1.0  # Configurable referral bonus in JDIN
 
+
 def referral(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     cursor.execute("SELECT referral_code FROM users WHERE user_id = ?", (user_id,))
@@ -17,6 +18,8 @@ def referral(update: Update, context: CallbackContext):
         update.message.reply_text(f"Your referral code is: {referral_code}")
     else:
         update.message.reply_text("You don't have an account. Use /start to create one.")
+
+
 def handle_referral_code_input(update: Update, context: CallbackContext):
     if not context.user_data.get("awaiting_referral"):
         return
@@ -68,6 +71,8 @@ def handle_referral_code_input(update: Update, context: CallbackContext):
 #
 #    conn.commit()
 #
+
+
 def register_user(user_id, username, referral_code, bonus, referrer_id=None):
     new_referral_code = generate_referral_code(user_id)
     cursor.execute("""
@@ -77,5 +82,7 @@ def register_user(user_id, username, referral_code, bonus, referrer_id=None):
     if referrer_id:
         cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (bonus, referrer_id))
     conn.commit()
+
+
 def generate_referral_code(user_id: int) -> str:
     return f"REF-{user_id}"

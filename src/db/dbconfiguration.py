@@ -1,5 +1,10 @@
 import sqlite3
+
+
+
 class DataBase:
+
+
     def __init__(self):
         conn = sqlite3.connect('jdin_bot.db')
         cursor = conn.cursor()
@@ -48,5 +53,7 @@ class DataBase:
             );''')
         conn.commit()
         conn.close()
+
+
 def connection():
     return sqlite3.connect("jdin_bot.db", check_same_thread=False).cursor()

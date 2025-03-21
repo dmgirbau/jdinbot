@@ -6,6 +6,8 @@ from telegram.ext import CallbackContext
 
 conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
 cursor = conn.cursor()
+
+
 def gamble(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (user_id,))
@@ -19,6 +21,8 @@ def gamble(update: Update, context: CallbackContext):
     update.message.reply_text(f"Your current balance is {user_balance:.4f} JDIN. Enter the amount you'd like to gamble:")
 
     context.user_data["awaiting_gamble_amount"] = True
+
+
 def handle_gamble_amount(update: Update, context: CallbackContext):
     if not context.user_data.get("awaiting_gamble_amount"):
         return
@@ -68,6 +72,8 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
 
     update.message.reply_text(f"Game Over! You won {winnings:.4f} JDIN with a streak of {streak}.")
     context.user_data["awaiting_gamble_amount"] = False
+
+
 def gambling_stats(update: Update, context: CallbackContext):
     """Provide statistics for gambling results."""
     cursor.execute("SELECT COUNT(*), SUM(winnings) FROM gambling_logs")

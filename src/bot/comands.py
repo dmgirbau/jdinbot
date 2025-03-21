@@ -7,9 +7,10 @@ from telegram.ext import CallbackContext
 
 conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
 cursor = conn.cursor()
+
+
 async def start(update: Update, context: CallbackContext):
     user = update.effective_user
-
 
     # Check if user already exists
     cursor.execute("SELECT * FROM users WHERE user_id = ?", (user.id,))
@@ -75,6 +76,7 @@ async def transfer(update: Update, context: CallbackContext):
 
     except ValueError:
         await update.message.reply_text("Invalid amount. Please enter a numeric value.")
+
 
 async def balance(update: Update, context: CallbackContext):
     conn = sqlite3.connect('jdin_bot.db')

@@ -22,6 +22,7 @@ else:
 
 logger = logging.getLogger(__name__)
 
+
 def main():
     database = DataBase()
     database.__init__()
@@ -35,6 +36,8 @@ def main():
     logger.info("Polling...")
     app.run_polling()
     logger.info("Bot stopped")
+
+
 if __name__ == "__main__":
     try:
         main()

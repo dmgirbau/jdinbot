@@ -23,6 +23,8 @@ def request_solana(update: Update, context: CallbackContext):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text("Choose an option for your Solana account setup:", reply_markup=reply_markup)
+
+
 def handle_solana_choice(update: Update, context: CallbackContext):
     query = update.callback_query
     user_id = query.from_user.id
@@ -33,6 +35,8 @@ def handle_solana_choice(update: Update, context: CallbackContext):
     elif query.data == "solana_new":
         query.edit_message_text("A new Solana account preparation will be requested. Proceeding...")
         process_solana_request(context,update,user_id, "new", None)
+
+
 async def process_solana_request(context: CallbackContext,update: Update,user_id: int, request_type: str, address: str = None,):
     # Fetch the fee based on type
     fee = 2.0 if request_type == "new" else 1.0  # Example fees
@@ -51,6 +55,8 @@ async def process_solana_request(context: CallbackContext,update: Update,user_id
     # Notify the admin
     ADMIN_CHAT = AppConfig().ADMIN_CHAT  # Replace with the actual admin chat ID
     await context.bot.send_message(chat_id=ADMIN_CHAT, text=f"New Solana setup request from user {user_id} (Type: {request_type}).")
+
+
 # Handle Solana address input
 async def handle_solana_address(update: Update, context: CallbackContext):
     if "solana_request_type" not in context.user_data:
@@ -65,15 +71,18 @@ async def handle_solana_address(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     await process_solana_request(user_id, context.user_data["solana_request_type"], address)
     del context.user_data["solana_request_type"]
+
+
 def validate_solana_address(address: str) -> bool:
     return len(address) == 44  # Simplistic validation
+
+
 async def approve_solana(update: Update, context: CallbackContext):
     user_id = int(context.args[0]) if context.args else None
 
     if not user_id:
         await update.message.reply_text("Usage: /approve_solana <user_id>")
         return
-
 
     request = transactioStatus(user_id)
 
