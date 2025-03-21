@@ -7,3 +7,4 @@ class AppConfig:
         load_dotenv(dotenv_path)
         self.TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
         self.APP_MODE = os.getenv("APP_MODE", "dev").lower()
+        self.ADMIN_CHAT = os.getenv("ADMIN_CHAT")
