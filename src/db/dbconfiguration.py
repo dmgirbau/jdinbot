@@ -48,3 +48,5 @@ class DataBase:
             );''')
         conn.commit()
         conn.close()
+def connection():
+    return sqlite3.connect("jdin_bot.db", check_same_thread=False).cursor()
