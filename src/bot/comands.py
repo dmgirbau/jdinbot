@@ -1,4 +1,3 @@
-import random
 import sqlite3
 from uuid import uuid4
 
