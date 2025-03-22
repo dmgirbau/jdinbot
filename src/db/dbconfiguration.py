@@ -43,14 +43,14 @@ class DataBase:
                 status TEXT DEFAULT 'pending',
                 fee REAL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                approved_at TIMESTAMP
-            );
+                approved_at TIMESTAMP)
+            ''')
             
-            CREATE TABLE IF NOT EXISTS solana_accounts (
+        cursor.execute('''CREATE TABLE IF NOT EXISTS solana_accounts (
                 user_id INTEGER PRIMARY KEY,
                 solana_address TEXT UNIQUE,
                 approved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );''')
+            )''')
         conn.commit()
         conn.close()
 
