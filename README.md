@@ -33,7 +33,8 @@
 ## 🛠️ Installation
 
 ### 1️⃣ Prerequisites
-- Python 3.13+
+- Python 3.11
+- dotenv 0.9.9
 - python-Telegram-bot 22.0+
 - Telegram Bot API Key (Create via [BotFather](https://t.me/botfather))
 
