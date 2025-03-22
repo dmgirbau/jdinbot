@@ -40,10 +40,6 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
         update.message.reply_text("Invalid amount. Ensure it is greater than 0 and within your account balance.")
         return
 
-    # Deduct bet amount from balance
-    cursor.execute("UPDATE users SET jdin_balance = jdin_balance - ? WHERE user_id = ?", (bet_amount, update.effective_user.id))
-    conn.commit()
-
     # Begin dice rolls
     rolls = []
     streak = 0
@@ -58,19 +54,23 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
             break
 
     # Calculate reward
-    multiplier = 5 ** max(0, streak - 1)
-    winnings = bet_amount * multiplier
-    cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (winnings, update.effective_user.id))
-    conn.commit()
+    multiplier = 0
+    winnings = 0
+    if streak != 0:
+        multiplier = 5 ** (streak - 1)
+        winnings = bet_amount * multiplier
+        cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (winnings, update.effective_user.id))
+        conn.commit()
+        update.message.reply_text(f"You got a winnings of {winnings}. That's a {multiplier + 1}X.")
+    else:
+        # Deduct bet amount from balance
+        cursor.execute("UPDATE users SET jdin_balance = jdin_balance - ? WHERE user_id = ?",(bet_amount, update.effective_user.id))
+        conn.commit()
+        update.message.reply_text(f"You already pay {bet_amount} in taxes, voluntary: You're a winner.")
 
     # Log the gambling session
-    cursor.execute("""
-        INSERT INTO gambling_logs (user_id, bet_amount, result_multiplier, winnings, rolls)
-        VALUES (?, ?, ?, ?, ?)
-    """, (update.effective_user.id, bet_amount, multiplier, winnings, ','.join(map(str, rolls))))
+    cursor.execute("""INSERT INTO gambling_logs (user_id, bet_amount, multiplier, winnings, streak) VALUES (?, ?, ?, ?, ?)""", (update.effective_user.id, bet_amount, multiplier, winnings, streak))
     conn.commit()
-
-    update.message.reply_text(f"Game Over! You won {winnings:.4f} JDIN with a streak of {streak}.")
     context.user_data["awaiting_gamble_amount"] = False
 
 
@@ -79,7 +79,7 @@ def gambling_stats(update: Update, context: CallbackContext):
     cursor.execute("SELECT COUNT(*), SUM(winnings) FROM gambling_logs")
     total_games, total_winnings = cursor.fetchone()
 
-    cursor.execute("SELECT MAX(result_multiplier) FROM gambling_logs")
+    cursor.execute("SELECT MAX(multiplier) FROM gambling_logs")
     max_multiplier = cursor.fetchone()[0] or 0
 
     update.message.reply_text(
