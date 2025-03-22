@@ -1,6 +1,5 @@
 import sqlite3
 from uuid import uuid4
-
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
