@@ -1,8 +1,9 @@
 import logging
 
-from telegram.ext import ApplicationBuilder, CommandHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler
 
-from bot.comands import start, transfer, balance
+from bot.comands import start, transfer, balance, gift_test
+from gamble.comands import gamble, handle_gamble_amount, AWAITING_GAMBLE_AMOUNT
 from config import AppConfig
 from db.dbconfiguration import DataBase
 
@@ -23,6 +24,17 @@ else:
 logger = logging.getLogger(__name__)
 
 
+gamble_conversation_handler = ConversationHandler(
+    entry_points=[CommandHandler("tax", gamble)],
+    states={
+        AWAITING_GAMBLE_AMOUNT: [
+            MessageHandler(Filters.text & ~Filters.command, handle_gamble_amount)
+        ]
+    },
+    fallbacks=[]
+)
+
+
 def main():
     database = DataBase()
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
@@ -30,6 +42,8 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("transfer", transfer))
     app.add_handler(CommandHandler("balance", balance))
+    app.add_handler(CommandHandler("gift", gift_test))
+    app.add_handler(gamble_conversation_handler)
 
     # Start the bot
     logger.info("Polling...")

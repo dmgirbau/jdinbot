@@ -94,3 +94,13 @@ async def balance(update: Update, context: CallbackContext):
         await update.message.reply_text(f"Your balance is {user[0]:.4f} JDIN.")
     else:
         await update.message.reply_text("You do not have an account. Use /start to create one.")
+
+
+async def gift_test(update: Update, context: CallbackContext):
+    conn = sqlite3.connect('jdin_bot.db')
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?",
+                   (100, update.effective_user.id))
+    conn.commit()
+    conn.close()

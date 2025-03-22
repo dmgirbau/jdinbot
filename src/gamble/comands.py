@@ -2,13 +2,15 @@ import random
 import sqlite3
 
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ConversationHandler
 
 conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
 cursor = conn.cursor()
 
+AWAITING_GAMBLE_AMOUNT = 1
 
-def gamble(update: Update, context: CallbackContext):
+
+async def gamble(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (user_id,))
     user = cursor.fetchone()
@@ -22,8 +24,10 @@ def gamble(update: Update, context: CallbackContext):
 
     context.user_data["awaiting_gamble_amount"] = True
 
+    return AWAITING_GAMBLE_AMOUNT
 
-def handle_gamble_amount(update: Update, context: CallbackContext):
+
+async def handle_gamble_amount(update: Update, context: CallbackContext):
     if not context.user_data.get("awaiting_gamble_amount"):
         return
 
@@ -60,7 +64,8 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
     # Calculate reward
     multiplier = 5 ** max(0, streak - 1)
     winnings = bet_amount * multiplier
-    cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (winnings, update.effective_user.id))
+    cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?",
+                   (winnings, update.effective_user.id))
     conn.commit()
 
     # Log the gambling session
@@ -72,6 +77,8 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
 
     update.message.reply_text(f"Game Over! You won {winnings:.4f} JDIN with a streak of {streak}.")
     context.user_data["awaiting_gamble_amount"] = False
+
+    return ConversationHandler.END
 
 
 def gambling_stats(update: Update, context: CallbackContext):
