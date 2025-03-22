@@ -41,11 +41,9 @@ def handle_gamble_amount(update: Update, context: CallbackContext):
         return
 
     # Begin dice rolls
-    rolls = []
     streak = 0
     while True:
         roll = random.randint(1, 6)
-        rolls.append(roll)
         if roll == 6:
             streak += 1
             update.message.reply_text(f"You rolled a 6! Streak: {streak}. Rolling again...")
