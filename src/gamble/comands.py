@@ -10,6 +10,16 @@ cursor = conn.cursor()
 
 
 async def gamble(update: Update, context: CallbackContext):
+
+    if not context.args:
+        await update.message.reply_text("Please provide the amount you want to tax. Example: /tax 50")
+        return
+    try:
+        bet_amount = float(context.args[0])
+    except ValueError:
+        await update.message.reply_text("Please enter a valid amount.")
+        return
+
     user_id = update.effective_user.id
     cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (user_id,))
     user = cursor.fetchone()
