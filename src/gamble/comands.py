@@ -4,9 +4,8 @@ import sqlite3
 from telegram import Update
 from telegram.ext import CallbackContext
 
-conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
-cursor = conn.cursor()
-
+from src.db.solanaRequest import balance
+from src.db.taxrequest import updatebalance, gambling_session, winingstatus, maxmultiplier
 
 
 async def gamble(update: Update, context: CallbackContext):
@@ -21,8 +20,8 @@ async def gamble(update: Update, context: CallbackContext):
         return
 
     user_id = update.effective_user.id
-    cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (user_id,))
-    user = cursor.fetchone()
+
+    user = balance(user_id)
 
     if not user:
         await update.message.reply_text("You don't have an account. Use /start to create one.")
@@ -50,29 +49,23 @@ async def gamble(update: Update, context: CallbackContext):
     if streak != 0:
         multiplier = 5 ** (streak - 1)
         winnings = bet_amount * multiplier
-        cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (winnings, update.effective_user.id))
-        conn.commit()
+        await updatebalance(winnings,user_id)
         await update.message.reply_text(f"You got a winnings of {winnings}. That's a {multiplier + 1}X.")
     else:
         # Deduct bet amount from balance
-        cursor.execute("UPDATE users SET jdin_balance = jdin_balance - ? WHERE user_id = ?",(bet_amount, update.effective_user.id))
-        conn.commit()
+        await updatebalance(bet_amount,user_id,mod="-")
         await update.message.reply_text(f"You already pay {bet_amount} in taxes, voluntary: You're a winner.")
 
     # Log the gambling session
-    cursor.execute("""INSERT INTO gambling_logs (user_id, bet_amount, multiplier, winnings, streak) VALUES (?, ?, ?, ?, ?)""", (update.effective_user.id, bet_amount, multiplier, winnings, streak))
-    conn.commit()
+        await gambling_session(user_id,bet_amount,multiplier,winnings,streak)
 
-
-def gambling_stats(update: Update, context: CallbackContext):
+async def gambling_stats(update: Update, context: CallbackContext):
     """Provide statistics for gambling results."""
-    cursor.execute("SELECT COUNT(*), SUM(winnings) FROM gambling_logs")
-    total_games, total_winnings = cursor.fetchone()
+    total_games, total_winnings = winingstatus().fetchone()
 
-    cursor.execute("SELECT MAX(multiplier) FROM gambling_logs")
-    max_multiplier = cursor.fetchone()[0] or 0
+    max_multiplier = maxmultiplier() or 0
 
-    update.message.reply_text(
+    await update.message.reply_text(
         f"Gambling Statistics:\n"
         f"- Total Games Played: {total_games}\n"
         f"- Total Winnings Distributed: {total_winnings:.4f} JDIN\n"
