@@ -3,24 +3,23 @@ import sqlite3
 from telegram import Update
 from telegram.ext import CallbackContext
 
-conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
-cursor = conn.cursor()
+from src.db.dbconfiguration import connection
+
 REFERRAL_BONUS = 1.0  # Configurable referral bonus in JDIN
 
 
-def referral(update: Update, context: CallbackContext):
+async def referral(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
-    cursor.execute("SELECT referral_code FROM users WHERE user_id = ?", (user_id,))
-    user = cursor.fetchone()
+    user = await connection().execute("SELECT referral_code FROM users WHERE user_id = ?", (user_id,)).fetchone()
 
     if user:
         referral_code = user[0]
-        update.message.reply_text(f"Your referral code is: {referral_code}")
+        await update.message.reply_text(f"Your referral code is: {referral_code}")
     else:
-        update.message.reply_text("You don't have an account. Use /start to create one.")
+        await update.message.reply_text("You don't have an account. Use /start to create one.")
 
 
-def handle_referral_code_input(update: Update, context: CallbackContext):
+async def handle_referral_code_input(update: Update, context: CallbackContext):
     if not context.user_data.get("awaiting_referral"):
         return
 
@@ -30,14 +29,13 @@ def handle_referral_code_input(update: Update, context: CallbackContext):
     username = user.username or "Anonymous"
 
     # Validate referral code
-    cursor.execute("SELECT user_id FROM users WHERE referral_code = ?", (referral_code,))
-    referrer = cursor.fetchone()
+    referrer = await connection().execute("SELECT user_id FROM users WHERE referral_code = ?", (referral_code,)).fetchone()
     if referrer:
         referrer_id = referrer[0]
-        register_user(user_id, username, referral_code, REFERRAL_BONUS, referrer_id)
-        update.message.reply_text(f"Account created! Referral bonus applied.")
+        await register_user(user_id, username, referral_code, REFERRAL_BONUS, referrer_id)
+        await update.message.reply_text(f"Account created! Referral bonus applied.")
     else:
-        update.message.reply_text("Invalid referral code. Try again or skip.")
+        await update.message.reply_text("Invalid referral code. Try again or skip.")
     context.user_data["awaiting_referral"] = False
 
 # Register a new user
@@ -73,16 +71,13 @@ def handle_referral_code_input(update: Update, context: CallbackContext):
 #
 
 
-def register_user(user_id, username, referral_code, bonus, referrer_id=None):
+async def register_user(user_id, username, referral_code, bonus, referrer_id=None):
     new_referral_code = generate_referral_code(user_id)
-    cursor.execute("""
+    await connection().execute("""
         INSERT INTO users (user_id, username, referral_code, referrer, jdin_balance, has_used_referral)
         VALUES (?, ?, ?, ?, ?, ?)
     """, (user_id, username, new_referral_code, referrer_id, bonus, referral_code is not None))
     if referrer_id:
-        cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (bonus, referrer_id))
-    conn.commit()
-
-
+        await connection().execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (bonus, referrer_id)).commit()
 def generate_referral_code(user_id: int) -> str:
     return f"REF-{user_id}"
