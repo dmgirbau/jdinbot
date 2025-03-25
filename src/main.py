@@ -1,10 +1,11 @@
 import logging
 
-from telegram.ext import ApplicationBuilder, CommandHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
 
-from src.bot.comands import start, transfer, balance
-from src.config import AppConfig
-from src.db.dbconfiguration import DataBase
+from bot.comands import start, transfer, balance, gift_test
+from gamble.comands import gamble
+from config import AppConfig
+from db.dbconfiguration import DataBase
 
 config = AppConfig()
 TELEGRAM_TOKEN = config.TELEGRAM_TOKEN
@@ -25,12 +26,13 @@ logger = logging.getLogger(__name__)
 
 def main():
     database = DataBase()
-    database.__init__()
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("transfer", transfer))
     app.add_handler(CommandHandler("balance", balance))
+    app.add_handler(CommandHandler("gift", gift_test))
+    app.add_handler(CommandHandler("tax", gamble))
 
     # Start the bot
     logger.info("Polling...")
@@ -42,4 +44,4 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Error: {e}", exc_info=True)

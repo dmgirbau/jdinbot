@@ -11,7 +11,8 @@ async def start(update: Update, context: CallbackContext):
     user = update.effective_user
 
     # Check if user already exists
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user.id,))
+    cursor.execute("SELECT * FROM users WHERE user_id = ?",
+                   (user.id,))
     existing_user = cursor.fetchone()
 
     if existing_user:
@@ -46,7 +47,8 @@ async def transfer(update: Update, context: CallbackContext):
         cursor = conn.cursor()
 
         # Validate recipient
-        cursor.execute("SELECT user_id FROM users WHERE unique_code = ?", (recipient_code,))
+        cursor.execute("SELECT user_id FROM users WHERE unique_code = ?",
+                       (recipient_code,))
         recipient = cursor.fetchone()
         if not recipient:
             await update.message.reply_text("Recipient not found.")
@@ -55,18 +57,22 @@ async def transfer(update: Update, context: CallbackContext):
         recipient_id = recipient[0]
 
         # Check sender balance
-        cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (update.effective_user.id,))
+        cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?",
+                       (update.effective_user.id,))
         sender = cursor.fetchone()
         if not sender or sender[0] < amount:
             await update.message.reply_text("Insufficient balance.")
             return
 
         # Update balances
-        cursor.execute("UPDATE users SET jdin_balance = jdin_balance - ? WHERE user_id = ?", (amount, update.effective_user.id))
-        cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?", (amount, recipient_id))
+        cursor.execute("UPDATE users SET jdin_balance = jdin_balance - ? WHERE user_id = ?",
+                       (amount, update.effective_user.id))
+        cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?",
+                       (amount, recipient_id))
 
         # Log transaction
-        cursor.execute("INSERT INTO transactions (from_user_id, to_user_id, amount) VALUES (?, ?, ?)", (update.effective_user.id, recipient_id, amount))
+        cursor.execute("INSERT INTO transactions (from_user_id, to_user_id, amount) VALUES (?, ?, ?)",
+                       (update.effective_user.id, recipient_id, amount))
         conn.commit()
 
         await update.message.reply_text(f"Successfully transferred {amount:.4f} JDIN to {recipient_code}.")
@@ -79,7 +85,8 @@ async def transfer(update: Update, context: CallbackContext):
 async def balance(update: Update, context: CallbackContext):
     conn = sqlite3.connect('jdin_bot.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (update.effective_user.id,))
+    cursor.execute("SELECT jdin_balance FROM users WHERE user_id = ?",
+                   (update.effective_user.id,))
     user = cursor.fetchone()
     conn.close()
 
@@ -87,3 +94,13 @@ async def balance(update: Update, context: CallbackContext):
         await update.message.reply_text(f"Your balance is {user[0]:.4f} JDIN.")
     else:
         await update.message.reply_text("You do not have an account. Use /start to create one.")
+
+
+async def gift_test(update: Update, context: CallbackContext):
+    conn = sqlite3.connect('jdin_bot.db')
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?",
+                   (100, update.effective_user.id))
+    conn.commit()
+    conn.close()
