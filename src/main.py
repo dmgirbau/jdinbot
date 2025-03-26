@@ -2,10 +2,10 @@ import logging
 
 from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
 
-from bot.comands import start, transfer, balance, gift_test
-from gamble.comands import gamble
-from config import AppConfig
-from db.dbconfiguration import DataBase
+from src.bot.comands import start, transfer, balance, gift_test
+from src.gamble.comands import gamble
+from src.config import AppConfig
+from src.db.dbconfiguration import DataBase
 
 config = AppConfig()
 TELEGRAM_TOKEN = config.TELEGRAM_TOKEN

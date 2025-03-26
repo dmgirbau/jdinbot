@@ -2,6 +2,13 @@
 
 **jdinbot** is an open-source **token management and gambling** bot built using `python-telegram-bot`. It provides users with **account management, referral rewards, JDIN transactions, Solana wallet integration, and an interactive gambling feature**.
 
+## 📣 Latest Updates (March 2025)
+
+- **✅ Improved Database Connection Management**: Implemented async connection pool for better reliability
+- **🛠️ Fixed `/tax` Command**: Ensured proper balance deduction when using the tax command
+- **📝 Better Documentation**: Added comprehensive docstrings to all database functions
+- **🪵 Enhanced Logging**: Added detailed logging for better debugging and monitoring
+
 ## 🚀 Features
 
 ### 🎟️ Account & Referral System
@@ -12,6 +19,7 @@
 ### 💰 JDIN Transactions
 - Users can transfer JDIN tokens to others using their **unique referral codes** or their **Telegram username**.
 - Transaction history is stored securely in an SQLite database.
+- `/tax` command allows users to voluntarily donate JDIN to the system.
 
 ### 🎲 Gambling: "Ofrenda al Lojdin"
 - Users can bet JDIN and roll a **6-sided die**, a form of voluntary taxation.
@@ -35,6 +43,7 @@
 ### 1️⃣ Prerequisites
 - Python 3.11
 - python-Telegram-bot 22.0+
+- aiosqlite 0.17.0+
 - dotenv 0.9.9
 - Telegram Bot API Key (Create via [BotFather](https://t.me/botfather))
 
@@ -62,8 +71,7 @@ ADMIN_CHAT=YOUR_TELEGRAM_ID
 ### 5️⃣ Run the Bot
 
 ```sh
-
-python jdinbot.py
+python -m src.main
 ```
 
 ## 🗄️Database Schema
@@ -73,7 +81,19 @@ SQLite is used for storage. Key tables:
 - **users**: Stores account data and referral codes.
 - **transactions**: Logs JDIN transfers.
 - **solana_requests**: Tracks wallet approval requests.
-- **gambling_logs**: Stores gambling outcomes.
+- **lojdin_statistics**: Stores gambling outcomes and statistics.
+
+## 🧑‍💻 Development
+
+### Database Connection Management
+
+The bot uses an async connection pool to manage SQLite connections efficiently:
+
+```python
+async with connection() as conn:
+    cursor = await conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+    result = await cursor.fetchone()
+```
 
 ## 🛠️ Development & Contribution
 

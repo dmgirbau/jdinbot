@@ -1,5 +1,6 @@
 import random
 import sqlite3
+import logging
 
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -20,14 +21,18 @@ async def gamble(update: Update, context: CallbackContext):
         return
 
     user_id = update.effective_user.id
+    logging.info(f"User {user_id} is trying to tax {bet_amount}")
 
-    user = balance(user_id)
+    user = await balance(user_id)
+    logging.info(f"User balance result: {user}")
 
     if not user:
         await update.message.reply_text("You don't have an account. Use /start to create one.")
         return
 
     user_balance = user[0]
+    logging.info(f"Current user balance: {user_balance}")
+    
     if bet_amount <= 0 or bet_amount > user_balance:
         await update.message.reply_text("Invalid amount. Ensure it is greater than 0 and within your account balance.")
         return
@@ -49,15 +54,17 @@ async def gamble(update: Update, context: CallbackContext):
     if streak != 0:
         multiplier = 5 ** (streak - 1)
         winnings = bet_amount * multiplier
-        await updatebalance(winnings,user_id)
+        update_result = await updatebalance(winnings, user_id)
+        logging.info(f"Added {winnings} to balance, result: {update_result}")
         await update.message.reply_text(f"You got a winnings of {winnings}. That's a {multiplier + 1}X.")
     else:
         # Deduct bet amount from balance
-        await updatebalance(bet_amount,user_id,mod="-")
+        update_result = await updatebalance(bet_amount, user_id, mod="-")
+        logging.info(f"Deducted {bet_amount} from balance, result: {update_result}")
         await update.message.reply_text(f"You already pay {bet_amount} in taxes, voluntary: You're a winner.")
 
     # Log the gambling session
-        await gambling_session(user_id,bet_amount,multiplier,winnings,streak)
+    await gambling_session(user_id, bet_amount, multiplier, winnings, streak)
 
 async def gambling_stats(update: Update, context: CallbackContext):
     """Provide statistics for gambling results."""
