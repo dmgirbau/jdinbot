@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, aiosqlite
 
 
 
@@ -55,5 +55,5 @@ class DataBase:
         conn.close()
 
 
-def connection():
-    return sqlite3.connect("jdin_bot.db", check_same_thread=False).cursor()
+async def connection():
+    return await aiosqlite.connect("jdin_bot.db", check_same_thread=False) # Return the connection, not the cursor
