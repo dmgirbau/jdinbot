@@ -7,15 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2025-03-26
-
-### Fixed
-- Database connection handling in all database operations
-- `/tax` command now correctly deducts the specified amount from user balance
-- Connection pool management to avoid "threads can only be started once" error
-- Proper implementation of async context manager protocol
-- Table references in gambling functions to use correct table name (`lojdin_statistics`)
-
 ### Added
 - Comprehensive docstrings to all database functions
 - Logging for debugging database operations
@@ -27,10 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved structure of database connection management
 - Enhanced error messages for better debugging
 
-## [1.0.0] - 2025-02-15
+### Fixed
+- Database connection handling in all database operations
+- `/tax` command now correctly deducts the specified amount from user balance
+- Connection pool management to avoid "threads can only be started once" error
+- Proper implementation of async context manager protocol
+- Table references in gambling functions to use correct table name (`lojdin_statistics`)
+
+## [1.0.0-pre.1] - 2025-03-26
 
 ### Added
-- Initial release of JDINBot
+- Initial pre-release version of JDINBot
 - Telegram bot commands for token management
 - Gambling system with multipliers
 - User balance tracking
