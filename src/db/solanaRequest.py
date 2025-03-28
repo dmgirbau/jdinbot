@@ -30,12 +30,12 @@ async def balance(userid: int):
     Returns:
         tuple or None: A tuple containing the user's balance if found, None if the user doesn't exist
     """
-    async with connection() as conn:  
+    async with connection() as conn:
         cursor = await conn.execute("SELECT jdin_balance FROM users WHERE user_id = ?", (userid,))
-        result = await cursor.fetchone()  
-        await cursor.close()  
+        result = await cursor.fetchone()
+        await cursor.close()
         # Return result as is (it's a tuple) or None if user doesn't exist
-        return result
+        return result[0]
 
 
 async def descountfee(fee, userid):
@@ -121,3 +121,8 @@ async def insertransaction(userid, solanaadress):
     async with connection() as conn:
         await conn.execute("INSERT INTO solana_accounts (user_id, solana_address) VALUES (?, ?)", (userid, solanaadress))
         await conn.commit()
+
+async def addreferbooonus(referrer_id,REFERRAL_BONUS=1):
+    async  with connection() as conn:
+            await conn.execute("UPDATE users SET jdin_balance = jdin_balance + ? WHERE user_id = ?",(REFERRAL_BONUS, referrer_id))
+            await conn.commit()
