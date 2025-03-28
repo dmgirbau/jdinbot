@@ -2,6 +2,7 @@ import sqlite3
 from uuid import uuid4
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
+from src.db.dbconfiguration import connection
 
 conn = sqlite3.connect("jdin_bot.db", check_same_thread=False)
 cursor = conn.cursor()
@@ -10,24 +11,37 @@ cursor = conn.cursor()
 async def start(update: Update, context: CallbackContext):
     user = update.effective_user
 
-    # Check if user already exists
-    cursor.execute("SELECT * FROM users WHERE user_id = ?",
-                   (user.id,))
-    existing_user = cursor.fetchone()
+    # Verificar si el usuario ya existe en la base de datos
+    async with connection() as conn:
+        cursor = await conn.execute("SELECT jdin_balance, unique_code FROM users WHERE user_id = ?", (user.id,))
+        existing_user = await cursor.fetchone()
+        await cursor.close()
 
     if existing_user:
-        await update.message.reply_text(
-            f"Welcome back, {user.first_name}! Your balance is {existing_user[2]:.4f} JDIN.")
+        balance, referral_code = existing_user
     else:
-        # Generate unique code
-        unique_code = str(uuid4())[:8]
-        cursor.execute("INSERT INTO users (user_id, username, unique_code) VALUES (?, ?, ?)",
-                       (user.id, user.username, unique_code))
-        conn.commit()
-        await update.message.reply_text(
-            f"Welcome {user.first_name}! Your account has been created with code: {unique_code}")
+        # Generar un código de referido único para el nuevo usuario
+        referral_code = str(uuid4())[:8]
+        balance = 0.0  # Balance inicial
 
-    conn.close()
+        async with connection() as conn:
+            await conn.execute(
+                "INSERT INTO users (user_id, username, balance, referral_code) VALUES (?, ?, ?, ?)",
+                (user.id, user.username, balance, referral_code)
+            )
+            await conn.commit()
+
+    # Crear el botón para insertar un código de referido
+    keyboard = [
+        [InlineKeyboardButton("Insertar código de referido", callback_data='insert_referral')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    # Enviar el mensaje con el balance, código de referido y el botón
+    await update.message.reply_text(
+        f"Bienvenido, {user.first_name}.\nTu balance actual es: {balance:.4f} JDIN.\nTu código de referido es: {referral_code}",
+        reply_markup=reply_markup
+    )
 
 
 async def transfer(update: Update, context: CallbackContext):
