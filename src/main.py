@@ -1,11 +1,13 @@
 import logging
 
-from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters, \
+    CallbackQueryHandler
 
 from src.bot.comands import start, transfer, balance, gift_test
 from src.gamble.comands import gamble
 from src.config import AppConfig
 from src.db.dbconfiguration import DataBase
+from src.referal.comands import referral, insert_referral_callback, handle_referral_code_input
 
 config = AppConfig()
 TELEGRAM_TOKEN = config.TELEGRAM_TOKEN
@@ -33,6 +35,9 @@ def main():
     app.add_handler(CommandHandler("balance", balance))
     app.add_handler(CommandHandler("gift", gift_test))
     app.add_handler(CommandHandler("tax", gamble))
+    app.add_handler(CommandHandler("referal", referral))
+    app.add_handler(CallbackQueryHandler(insert_referral_callback, pattern='^insert_referral$'))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_referral_code_input))
 
     # Start the bot
     logger.info("Polling...")
