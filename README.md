@@ -1,6 +1,6 @@
 # jdinbot
 
-**jdinbot** is an open-source **token management and gambling** bot built using `python-telegram-bot`. It provides users with **account management, referral rewards, JDIN transactions, Solana wallet integration, and an interactive gambling feature**.
+**jdinbot** is an open-source **banking** bot built using `python-telegram-bot`. It provides users with **account management, referral rewards, JDIN transactions, cashu integration, and an interactive gambling feature**.
 
 ## 📣 Latest Updates (March 2025)
 
@@ -26,16 +26,12 @@
 - Consecutive rolls of **6** multiply rewards exponentially.
 - Full transaction logs with betting history.
 
-### 🔗 Solana Wallet Integration
-- Users can request Solana account setup:
-  - **Existing Address:** Direct deposit activation, with a minimal **configurable fee**.
-  - **New Address:** Requires admin approval and JDIN payment.
-- Only **one approved Solana wallet per user**.
+### 🔗 Cashu Integration
+
 
 ### 📊 Admin & Analytics
 - View **gambling results history** and **total JDIN in circulation**.
 - Statistics.
-- Admins can manually approve **Solana wallet** requests.
 - Full **transaction and gambling history logs**.
 
 ## 🛠️ Installation
@@ -80,7 +76,6 @@ SQLite is used for storage. Key tables:
 
 - **users**: Stores account data and referral codes.
 - **transactions**: Logs JDIN transfers.
-- **solana_requests**: Tracks wallet approval requests.
 - **lojdin_statistics**: Stores gambling outcomes and statistics.
 
 ## 🧑‍💻 Development
