@@ -16,18 +16,18 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 
 ## Development Setup
 
-## Architecture
+### Architecture
 - Python 3.11, FastAPI, aiogram
 - PostgreSQL for persistent storage
 - Docker multi-stage builds + Poetry-managed dependencies
 
-## Quickstart (Development)
+### Quickstart (Development)
 1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID).
 2. Start dev environment (hot reload):  
    `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
 3. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
 
-## Quickstart (Production)
+### Quickstart (Production)
 1. Build & run production images:
    `docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d`
 2. Apply database migrations:
@@ -39,7 +39,7 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 alembic revision --autogenerate -m "init schema"
 alembic upgrade head
 ```
-## Contribution Guide
+# Contribution Guideline
 
 - See `CONTRIBUTING.md` for details. TL;DR:
   - Tests required for new features.
@@ -75,7 +75,7 @@ We welcome contributions! Please:
 - Maintain a `MAINTAINERS.md` and a `CODEOWNERS` file so community knows who to ping for reviews.
 
 
-## Roadmap
+# Roadmap
 
 
 
