@@ -1,37 +1,172 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "jdinbot"
 version = "0.1.0"
-description = "JDINBot Pro Rewrite"
+description = "High-performance Telegram bot built with Aiogram 3.x and FastAPI, featuring async PostgreSQL support, advanced logging with Structlog, and comprehensive monitoring with Prometheus metrics."
 readme = "README.md"
-requires-python = ">=3.12"
+authors = [
+    {name = "jdasoi", email = "dmgirbau@gmail.com"}
+]
+license = {text = "MIT"}
+keywords = ["telegram", "bot", "fastapi", "async", "postgresql", "aiogram"]
+
+requires-python = ">=3.13,<4"
+
 dependencies = [
-"aiogram>=3.6",
-"fastapi>=0.115",
-"uvicorn[standard]",
-"SQLAlchemy[asyncio]>=2.0",
-"asyncpg",
-"alembic",
-"pydantic-settings",
-"structlog",
-"prometheus-fastapi-instrumentator",
+    "aiogram>=3.6,<4.0",
+    "fastapi>=0.115,<0.116",
+    "uvicorn[standard]>=0.30,<0.31",
+    "SQLAlchemy[asyncio]>=2.0,<3.0",
+    "asyncpg>=0.30.0,<0.31.0",
+    "alembic>=1.13,<2.0",
+    "pydantic-settings>=2.4,<3.0",
+    "structlog>=24.1,<25.0",
+    "prometheus-fastapi-instrumentator>=7.0,<8.0",
+    "python-dateutil>=2.9,<3.0",
+    "httpx>=0.26,<0.27",
+    "passlib[bcrypt]>=1.7,<2.0"
 ]
 
-
-dev = [
-"pytest",
-"pytest-asyncio",
-"mypy",
-"ruff",
-"black",
-"bandit",
+dynamic = [
+    "classifiers",
+    "version"
 ]
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
 
+[project.urls]
+Homepage = "https://github.com/dmgirbau/jdinbot"
+Repository = "https://github.com/dmgirbau/jdinbot"
+Documentation = "https://github.com/dmgirbau/jdinbot#readme"
+
+[project.scripts]
+jdinbot = "jdinbot.main:main"
+test = "pytest:main"
+lint = "ruff.__main__:main"
+format = "black.__main__:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+
+[tool.setuptools.package-data]
+jdinbot = ["py.typed"]
+
+# ---- Poetry specific config ----
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^5.0"
+pytest-asyncio = "^0.23"
+flake8 = "^7.0"
+isort = "^5.13"
+mypy = "^1.11"
+black = "^24.1"
+types-requests = "^2.31"
+types-passlib = "^1.7"
+types-python-dateutil = "^2.8"
+ruff = "^0.5"
+bandit = "^1.7"
+ipython = "^8.14"
+pre-commit = "^3.3"
+sphinx = "^7.4"
+furo = "^2024.1.29"
+safety = "^2.3"
+tox = "^4.12"
+watchdog = "^3.0"
+
+# ---- Tool configs ----
 
 [tool.black]
 line-length = 100
 
 [tool.ruff]
 line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["app"]
+default_section = "THIRDPARTY"
+forced_separate = ["app"]
+combine_as_imports = true
+include_trailing_comma = true
+skip_gitignore = true
+skip = ["venv", ".venv", "__pypackages__"]
+multi_line_output = 3
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+lines_after_imports = 2
+
+[tool.mypy]
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+ignore_missing_imports = true
+follow_imports = "silent"
+strict = true
+show_error_codes = true
+warn_unused_configs = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true 
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict_equality = true
+allow_redefinition = false
+allow_untyped_globals = false
+local_partial_types = true  
+warn_no_return = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = ["venv", ".venv", "__pypackages__"]
+
+[tool.pydantic-mypy]
+init_typed = true
+warn_untyped_fields = true
+warn_untyped_models = true
+warn_redundant_casts = true
+warn_unused_ignores = true  
+warn_no_return = true
+
+[tool.sphinx]
+project = "JDINBot"
+author = "jdasoi"
+version = "0.1.0"
+release = "0.1.0"
+language = "en"
+source-dir = "docs"
+build-dir = "docs/_build"
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+html_theme = "furo"
+html_static_path = ["docs/_static"]
+html_theme_options = { "navigation_depth" = 4, "collapse_navigation" = false, "sticky_navigation" = true }
+html_sidebars = { "**" = ["globaltoc.html", "relations.html", "searchbox.html"] }
+
+[tool.sphinx.apidoc]
+module-dir = "app"
+output-dir = "docs/api"
+separate = true
+toc-file = "index"
+
+[tool.sphinx.autodoc]
+member-order = "bysource"
+autodoc-typehints = "description"
+
+[tool.sphinx.napoleon]
+google-docstring = true
+numpy-docstring = false
+include-init-with-doc = true
+private-members = false
+special-members = "__init__"
+inherited-members = true
+show-inheritance = true
