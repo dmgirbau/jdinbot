@@ -1,110 +1,69 @@
-# jdinbot
-
-**jdinbot** is an open-source **banking** bot built using `python-telegram-bot`. It provides users with **account management, referral rewards, JDIN transactions, cashu integration, and an interactive gambling feature**.
-
-## 📣 Latest Updates (March 2025)
-
-- **✅ Improved Database Connection Management**: Implemented async connection pool for better reliability
-- **🛠️ Fixed `/tax` Command**: Ensured proper balance deduction when using the tax command
-- **📝 Better Documentation**: Added comprehensive docstrings to all database functions
-- **🪵 Enhanced Logging**: Added detailed logging for better debugging and monitoring
-
-## 🚀 Features
-
-### 🎟️ Account & Referral System
-- Users receive a unique referral code upon registration.
-- Optional referral input during signup to earn a **configurable JDIN bonus**.
-- Referral rewards are credited to both the user and the referrer.
-
-### 💰 JDIN Transactions
-- Users can transfer JDIN tokens to others using their **unique referral codes** or their **Telegram username**.
-- Transaction history is stored securely in an SQLite database.
-- `/tax` command allows users to voluntarily donate JDIN to the system.
-
-### 🎲 Gambling: "Ofrenda al Lojdin"
-- Users can bet JDIN and roll a **6-sided die**, a form of voluntary taxation.
-- Consecutive rolls of **6** multiply rewards exponentially.
-- Full transaction logs with betting history.
-
-### 🔗 Cashu Integration
+# JDINBot
 
 
-### 📊 Admin & Analytics
-- View **gambling results history** and **total JDIN in circulation**.
-- Statistics.
-- Full **transaction and gambling history logs**.
+A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **PostgreSQL**. This project is designed both as a **learning project** (to explore professional-grade software practices) and as a **production-ready system** to power community interactions.
 
-## 🛠️ Installation
 
-### 1️⃣ Prerequisites
-- Python 3.11
-- python-Telegram-bot 22.0+
-- aiosqlite 0.17.0+
-- dotenv 0.9.9
-- Telegram Bot API Key (Create via [BotFather](https://t.me/botfather))
+## Features
+- Telegram bot built with [aiogram](https://docs.aiogram.dev)
+- REST API with [FastAPI](https://fastapi.tiangolo.com)
+- PostgreSQL database with async [SQLAlchemy](https://docs.sqlalchemy.org)
+- Database migrations via [Alembic](https://alembic.sqlalchemy.org)
+- Dockerized development setup
+- Strict linting, type-checking, and testing culture
+- Secure, scalable, open-source mindset
 
-### 2️⃣ Clone the Repository
-```sh
-git clone https://github.com/dmgirbau/jdinbot.git
-cd jdinbot
+
+## Development Setup
+
+
+### Requirements
+- Python 3.11+
+- Docker & Docker Compose
+
+
+### Run with Docker Compose
+```bash
+docker-compose up --build
 ```
+The bot will connect to Telegram and expose a REST API at http://localhost:8000.
 
-### 3️⃣ Install Dependencies
-
-```sh
+### Run locally
+```bash
 pip install -r requirements.txt
+cp .env.example .env  # fill in your TELEGRAM_TOKEN and DB details
+uvicorn app.main:app --reload
 ```
-
-### 4️⃣ Configure the Bot
-
-Create a `.env` file in the root directory and add:
-
-```ini
-TELEGRAM_TOKEN=YOUR_TELEGRAM_BOT_API_KEY
-ADMIN_CHAT=YOUR_TELEGRAM_ID
+### Database migrations
+```bash
+alembic revision --autogenerate -m "init schema"
+alembic upgrade head
 ```
+## Contribution Guide
 
-### 5️⃣ Run the Bot
+We welcome contributions! Please:
 
-```sh
-python -m src.main
-```
+* Open an issue for discussion before major changes
 
-## 🗄️Database Schema
+* Follow PEP8 style guide
 
-SQLite is used for storage. Key tables:
+* Run black, ruff, and mypy before committing
 
-- **users**: Stores account data and referral codes.
-- **transactions**: Logs JDIN transfers.
-- **lojdin_statistics**: Stores gambling outcomes and statistics.
+* Write tests for new features
 
-## 🧑‍💻 Development
+## Security
 
-### Database Connection Management
+* Secrets must be kept in .env files or environment variables
 
-The bot uses an async connection pool to manage SQLite connections efficiently:
+* Do not hardcode API keys or credentials
 
-```python
-async with connection() as conn:
-    cursor = await conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    result = await cursor.fetchone()
-```
+* Use least privilege when deploying in production
 
-## 🛠️ Development & Contribution
+## Roadmap
 
-We welcome **pull requests and issues**! Follow these steps:
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature-name`).
-3. Commit changes (`git commit -m "Added feature X"`).
-4. Push to GitHub (`git push origin feature-name`).
-5. Create a pull request.
 
-## 📜 License
 
-This project is licensed under the **GPL-3.0 License**.
+## License
 
-## 🌟 Support & Contact
-
-- **Contribute:** [GitHub Issues](https://github.com/dmgirbau/jdinbot/issues)
-- **Telegram Channel:** https://t.me/lojdin
+This project is open-source under the MIT License.

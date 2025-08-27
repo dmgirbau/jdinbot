@@ -1,0 +1,38 @@
+[project]
+name = "jdinbot"
+version = "0.1.0"
+description = "JDINBot Pro Rewrite"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+"aiogram>=3.6",
+"fastapi>=0.115",
+"uvicorn[standard]",
+"SQLAlchemy[asyncio]>=2.0",
+"asyncpg",
+"alembic",
+"pydantic-settings",
+"structlog",
+"prometheus-fastapi-instrumentator",
+]
+
+
+dev = [
+"pytest",
+"pytest-asyncio",
+"mypy",
+"ruff",
+"black",
+"bandit",
+]
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.black]
+line-length = 100
+
+
+[tool.ruff]
+line-length = 100
