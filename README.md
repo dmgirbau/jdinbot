@@ -20,6 +20,64 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 - PostgreSQL for persistent storage
 - Docker multi-stage builds + Poetry-managed dependencies
 
+#### Proyect Structure
+
+```pgsql
+jdinbot/
+├─ .devcontainer/
+│  └─ devcontainer.json
+├─ .github/
+│  └─ workflows/
+│     └─ ci.yml
+├─ alembic/                      # migrations (si usas alembic)
+│  └─ versions/
+├─ src/
+│  └─ app/
+│     ├─ __init__.py
+│     ├─ main.py                  # uvicorn app.main:app
+│     ├─ core/
+│     │  ├─ config.py
+│     │  └─ logging.py
+│     ├─ api/
+│     │  └─ v1/
+│     │     ├─ routers.py
+│     │     └─ schemas.py
+│     ├─ bot/
+│     │  ├─ __init__.py
+│     │  ├─ dispatcher.py
+│     │  ├─ commands.py
+│     │  ├─ handlers/
+│     │  │  ├─ start.py
+│     │  │  └─ admin.py
+│     │  ├─ middlewares.py
+│     │  └─ keyboards.py
+│     ├─ db/
+│     │  ├─ base.py
+│     │  ├─ models/
+│     │  │  └─ user.py
+│     │  ├─ session.py
+│     │  └─ crud.py
+│     ├─ services/
+│     │  └─ telegram_service.py
+│     ├─ tasks/                   # Celery / background tasks (si aplica)
+│     └─ utils/
+│        └─ helpers.py
+├─ tests/
+│  └─ test_basic.py
+├─ scripts/
+│  └─ setup_db.sh
+├─ docker-compose.yml
+├─ Dockerfile
+├─ build.sh
+├─ pyproject.toml
+├─ .env.example
+├─ README.md
+├─ LICENSE
+├─ CONTRIBUTING.md
+├─ CODE_OF_CONDUCT.md
+└─ SECURITY.md
+```
+
 ### Quickstart (Development)
 
 1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID).
