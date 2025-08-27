@@ -1,50 +1,81 @@
-# ===== Base image =====
-FROM python:3.13-slim AS base
 
-# ===== System dependencies =====
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    build-essential \
- && rm -rf /var/lib/apt/lists/*
+# syntax=docker/dockerfile:1.4
+ARG PYTHON_VERSION=3.13
+ARG POETRY_VERSION=1.6.0
+ARG APP_USER=jdin
+ARG APP_UID=1001
+ARG APP_GID=1001
 
-# ===== Install Poetry =====
-ENV POETRY_HOME="/opt/poetry"
-ENV PATH="$POETRY_HOME/bin:$PATH"
-RUN curl -sSL https://install.python-poetry.org | python3 -
+########################
+### Builder stage
+########################
+FROM python:${PYTHON_VERSION}-slim AS builder
 
-# ===== Set working directory =====
-WORKDIR "/workspaces/jdinbot"
+# essential build deps
+ENV DEBIAN_FRONTEND=noninteractive \
+    POETRY_HOME=/opt/poetry \
+    PATH=/opt/poetry/bin:$PATH \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# ===== Copy dependency files first (caching) =====
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl build-essential git gcc libpq-dev ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry (official installer)
+RUN curl -sSL https://install.python-poetry.org | python3 - \
+  && poetry --version
+
+WORKDIR /app
+
+# Copy only dependency manifests first for caching
 COPY pyproject.toml poetry.lock* /app/
 
-# ===== Build argument to switch modes =====
-ARG DEV_MODE=true
+# Use BuildKit cache for Poetry caches (speeds up repeated builds)
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    poetry config virtualenvs.create false \
+ && --mount=type=cache,target=/root/.cache/pip \
+    poetry install --no-interaction --no-ansi --only main
 
-# ===== Install dependencies =====
-RUN if [ "$DEV_MODE" = "true" ]; then \
-        # Dev mode: virtualenv inside project \
-        poetry config virtualenvs.in-project true && \
-        poetry install --no-root --only main; \
-    else \
-        # Prod mode: global installation \
-        poetry config virtualenvs.create false && \
-        poetry install --no-root --only main; \
-    fi
-
-# ===== Copy source code =====
+# Copy rest of the project
 COPY . /app
 
-# ===== Install current project =====
-RUN if [ "$DEV_MODE" = "true" ]; then \
-        poetry install --editable; \
-    else \
-        poetry install; \
-    fi
+# (optional) run tests / build steps for compiled deps here
 
-# ===== Default command =====
-CMD ["poetry", "run", "python", "bot.py"]  # adjust to your entry script
+########################
+### Runtime stage
+########################
+FROM python:${PYTHON_VERSION}-slim AS runtime
 
-# ===== Final stage =====
-FROM base AS final
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH=/home/${APP_USER}/.local/bin:$PATH
+
+# minimal runtime deps
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user & group (use build args so CI can override if needed)
+RUN groupadd -g ${APP_GID} ${APP_USER} || true \
+ && useradd --uid ${APP_UID} --gid ${APP_GID} --create-home --shell /bin/sh ${APP_USER} || true
+
+WORKDIR /app
+
+# Copy site-packages installed by builder (we asked Poetry to install into system site-packages)
+COPY --from=builder /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages
+COPY --from=builder /app /app
+
+# ensure ownership
+RUN chown -R ${APP_USER}:${APP_USER} /app
+
+# add a tiny entrypoint that handles signals
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+USER ${APP_USER}
+ENV HOME=/home/${APP_USER}
+
+EXPOSE 8000
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

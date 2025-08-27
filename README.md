@@ -16,24 +16,24 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 
 ## Development Setup
 
+## Architecture
+- Python 3.11, FastAPI, aiogram
+- PostgreSQL for persistent storage
+- Docker multi-stage builds + Poetry-managed dependencies
 
-### Requirements
-- Python 3.11+
-- Docker & Docker Compose
+## Quickstart (Development)
+1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID).
+2. Start dev environment (hot reload):  
+   `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
+3. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
 
-
-### Run with Docker Compose
-```bash
-docker-compose up --build
+## Quickstart (Production)
+1. Build & run production images:
+   `docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d`
+2. Apply database migrations:
+   `docker compose exec web alembic upgrade head`  (if applicable)
 ```
-The bot will connect to Telegram and expose a REST API at http://localhost:8000.
 
-### Run locally
-```bash
-pip install -r requirements.txt
-cp .env.example .env  # fill in your TELEGRAM_TOKEN and DB details
-uvicorn app.main:app --reload
-```
 ### Database migrations
 ```bash
 alembic revision --autogenerate -m "init schema"
@@ -41,15 +41,20 @@ alembic upgrade head
 ```
 ## Contribution Guide
 
-We welcome contributions! Please:
+- See `CONTRIBUTING.md` for details. TL;DR:
+  - Tests required for new features.
+  - Document public API or bot commands in `docs/`.
+  - Use small, focused PRs.
 
-* Open an issue for discussion before major changes
+We welcome contributions! Please:
 
 * Follow PEP8 style guide
 
-* Run black, ruff, and mypy before committing
-
-* Write tests for new features
+## Development workflow (recommended)
+- Create an issue before major changes.
+- Open a feature branch `feature/short-description`.
+- Run formatters & linters before pushing: `black . && ruff check . && mypy .`
+- Create a Pull Request referencing the issue; request 1+ reviews.
 
 ## Security
 
@@ -58,6 +63,17 @@ We welcome contributions! Please:
 * Do not hardcode API keys or credentials
 
 * Use least privilege when deploying in production
+
+* Report security issues privately following `SECURITY.md`.
+
+## FAQ / Troubleshooting
+- If you get permission issues when mounting code in dev, set `UID`/`GID` env vars (e.g. `export UID=$(id -u) GID=$(id -g)`).
+
+## Community & Governance
+- Use GitHub Issues for bugs & feature requests.
+- Use Discussions (or a Telegram/Matrix room) for design conversations.
+- Maintain a `MAINTAINERS.md` and a `CODEOWNERS` file so community knows who to ping for reviews.
+
 
 ## Roadmap
 
