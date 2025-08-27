@@ -35,6 +35,7 @@ jdinbot/
 │     │  ├─ base.py
 │     │  ├─ models/
 │     │  │  ├─ __init__.py
+│     │  │  ├─ transactions.py
 │     │  │  └─ user.py
 │     │  ├─ session.py
 │     │  ├─ engine.py
