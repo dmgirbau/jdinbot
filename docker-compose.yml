@@ -16,16 +16,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # DEV_MODE is determined by environment variable, default true
-        DEV_MODE: "${DEV_MODE:-true}"
-    environment:
-      - ENV=${ENV:-development}
-    volumes:
-      # Only mount source code if in dev mode
-      - type: bind
-        source: .
-        target: /app
-        read_only: ${DEV_MODE:-true} != "false"  # pseudo logic
+         PYTHON_VERSION: "3.13"
+         POETRY_VERSION: "1.6.0"   # optional
+    image: jdinbot:latest
     depends_on:
       - postgres
     env_file:
@@ -33,6 +26,7 @@ services:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     ports:
       - "8000:8000"
+    restart: unless-stopped
 
 volumes:
   pgdata:
