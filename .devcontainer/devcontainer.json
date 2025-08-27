@@ -13,6 +13,12 @@
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/workspaces/jdinbot",
+	
+	"containerEnv": {
+    "DEV_MODE": "true",
+    "ENV": "development"
+  },
+
 	"features": {
 		"ghcr.io/devcontainers/features/git-lfs:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
