@@ -1,4 +1,8 @@
 # app/main.py
+
+# uvicorn app.main:app
+# --host 0.0.0.0 --port 8000
+
 """
 FastAPI + aiogram starter for JDINBot.
 - Webhook when PUBLIC_BASE_URL is set, otherwise polling.
