@@ -21,14 +21,11 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual environments (for local development, not Docker)
+# Poetry and environments
+# Don't ignore poetry.lock as it should be version controlled
+.venv/
+.poetry/
 venv/
-env/
-ENV/
-.env.bak/
-venv.bak/
-
-# Environment variables
 .env
 .env.local
 .env.development.local
@@ -37,13 +34,33 @@ venv.bak/
 
 # Docker
 docker-compose.override.yml
+.dockerignore
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# VS Code + Dev Containers
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+.devcontainer/*
+!.devcontainer/devcontainer.json
+!.devcontainer/Dockerfile
+
+# Project Specific
+.cache/
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.black.cache/
+pgdata/
+.tox/
+.nox/
 
 # OS
 .DS_Store
@@ -61,6 +78,7 @@ logs/
 # Database
 *.db
 *.sqlite3
+*.sqlite
 
 # Coverage reports
 htmlcov/
@@ -74,15 +92,15 @@ coverage.xml
 
 # PyCharm
 .idea/
-
-# VS Code
-.vscode/
-
-# Misc
-.dockerignore
-.venv
+*.iml
+*.iws
+*.ipr
 
 # Application specific
 /media/
 /staticfiles/
 /uploads/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
