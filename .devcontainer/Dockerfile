@@ -14,7 +14,7 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # ===== Set working directory =====
-WORKDIR /app
+WORKDIR "/workspaces/jdinbot"
 
 # ===== Copy dependency files first (caching) =====
 COPY pyproject.toml poetry.lock* /app/
