@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
       args:
          PYTHON_VERSION: "3.13"
-         POETRY_VERSION: "1.6.0"   # optional
+         POETRY_VERSION: "2.1.4"   # optional
     image: jdinbot:latest
     depends_on:
       - postgres
