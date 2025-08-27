@@ -12,92 +12,62 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 - Strict linting, type-checking, and testing culture
 - Secure, scalable, open-source mindset
 
+## Architecture
+
+JDINBot is built with a modern, scalable architecture designed for high performance and maintainability:
+
+### Core Technologies
+
+- **Python 3.13** with full async/await support
+- **FastAPI** for high-performance REST API endpoints with automatic OpenAPI documentation
+- **Aiogram 3.x** for modern Telegram Bot API integration
+- **PostgreSQL 16** with async support via asyncpg for persistent storage
+- **SQLAlchemy 2.0** with async ORM capabilities
+- **Poetry** for dependency management and packaging
+
+### Infrastructure & Tooling
+
+- **Docker** with multi-stage builds for optimized containerization
+- **Docker Compose** for local development and production deployments
+- **VS Code DevContainers** for consistent development environments
+- **Alembic** for database migrations with autogenerate support
+- **Structlog** for structured, production-ready logging
+- **Prometheus** integration for metrics and monitoring
+
+### Code Quality & Security
+
+- **Ruff** for ultra-fast linting and formatting
+- **Mypy** for strict static type checking
+- **Black** for consistent code formatting
+- **Pytest** with async support for comprehensive testing
+- **Bandit** for security scanning
+- **Pre-commit hooks** for quality control
+
+### Project Structure
+
+The project follows a modular `src` layout with clear separation of concerns:
+
+- `src/app/core/` - Configuration and foundational utilities
+- `src/app/api/` - FastAPI routes and REST endpoints  
+- `src/app/bot/` - Telegram bot handlers and middleware
+- `src/app/db/` - Database models and async session management
+- `src/app/services/` - Business logic and external integrations
+- `src/app/utils/` - Shared utilities and helpers
+
+This architecture ensures the application is:
+
+- **Highly scalable** with async-first design
+- **Type-safe** with comprehensive static analysis
+- **Well-tested** with extensive test coverage
+- **Production-ready** with proper logging and monitoring
+- **Developer-friendly** with consistent tooling and environments
+- **Secure** with built-in security scanning and best practices
+
 ## Development Setup
-
-### Architecture
-
-- Python 3.11, FastAPI, aiogram
-- PostgreSQL for persistent storage
-- Docker multi-stage builds + Poetry-managed dependencies
-
-#### Proyect Structure
-
-```pgsql
-jdinbot/
-├─ .devcontainer/
-│  └─ devcontainer.json
-├─ docker/
-│  └─ entrypoint.sh
-├─ .github/
-│  ├─ workflows/
-│  |  └─ ci.yml
-|  └──dependabot.yml
-├─ alembic/                       # migrations
-│  ├─ env.py
-|  └─ versions/
-├─ src/
-│  └─ app/
-│     ├─ __init__.py
-│     ├─ main.py                  # uvicorn app.main:app
-│     ├─ core/
-│     │  ├─ config.py
-│     │  └─ logging.py
-│     ├─ api/
-│     │  ├─ http.py
-│     │  └─ v1/
-│     │     ├─ routers.py
-│     │     └─ schemas.py
-│     ├─ bot/
-│     │  ├─ __init__.py
-│     │  ├─ dispatcher.py
-│     │  ├─ commands.py
-│     │  ├─ handlers/
-│     │  │  ├─ __init__.py
-│     │  │  ├─ common.py
-│     │  │  ├─ start.py
-│     │  │  └─ admin.py
-│     │  ├─ middlewares.py
-│     │  ├─ keyboards.py
-│     │  └─ bot.py
-│     ├─ db/
-│     │  ├─ base.py
-│     │  ├─ models/
-│     │  │  ├─ models.py.py
-│     │  │  └─ user.py
-│     │  ├─ session.py
-│     │  ├─ engine.py
-│     │  └─ crud.py
-│     ├─ services/
-│     │  └─ telegram_service.py
-│     ├─ tasks/                   # Celery / background tasks
-│     └─ utils/
-│     │  ├─ money.py
-│        └─ helpers.py
-├─ tests/
-│  ├─ test_basic.py
-│  ├─ test_gamble.py
-│  └─ test_transfer.py
-├─ scripts/
-│  ├─ build.sh
-|  └─ setup_db.sh
-├─ docker-compose.dev.yml
-├─ docker-compose.prod.yml
-├─ docker-compose.yml
-├─ Dockerfile
-├─ pyproject.toml
-├─ .env                           # ignored by git
-├─ .env.example
-├─ .gitignore
-├─ README.md
-├─ LICENSE
-├─ CONTRIBUTING.md
-├─ CODE_OF_CONDUCT.md
-└─ SECURITY.md
-```
 
 ### Quickstart (Development)
 
-1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID).
+1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID)
 2. Start dev environment (hot reload):  
    `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
 3. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
@@ -107,13 +77,26 @@ jdinbot/
 1. Build & run production images:
    `docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d`
 2. Apply database migrations:
-   `docker compose exec web alembic upgrade head`  (if applicable)
+   `docker compose exec bot alembic upgrade head`
+
+### VS Code DevContainer
+
+This project includes a DevContainer configuration for VS Code. To use it:
+
+1. Install the Dev Containers extension in VS Code
+2. Open the command palette (Ctrl+Shift+P) and select "Dev Containers: Reopen in Container"
+3. The container will build and setup the development environment automatically
 
 ### Database migrations
 
+Migrations are handled via Alembic. To create and apply migrations:
+
 ```bash
-alembic revision --autogenerate -m "init schema"
-alembic upgrade head
+# Create a new migration
+docker compose exec bot alembic revision --autogenerate -m "description"
+
+# Apply migrations
+docker compose exec bot alembic upgrade head
 ```
 
 ## Contribution Guideline
@@ -125,14 +108,20 @@ alembic upgrade head
 
 We welcome contributions! Please:
 
-- Follow PEP8 style guide
+- Follow PEP8 style guide.
 
 ### Development workflow (recommended)
 
 - Create an issue before major changes.
-- Open a feature branch `feature/short-description`.
-- Run formatters & linters before pushing: `black . && ruff check . && mypy .`
-- Create a Pull Request referencing the issue; request 1+ reviews.
+- Open a feature branch `feature/short-description`
+- Run formatters & linters before pushing:
+
+  ```bash
+  black .
+  ruff check .
+  mypy .
+
+-Create a Pull Request referencing the issue; request 1+ reviews.
 
 ### Security
 
