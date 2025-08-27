@@ -26,11 +26,15 @@ A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **Pos
 jdinbot/
 ├─ .devcontainer/
 │  └─ devcontainer.json
+├─ docker/
+│  └─ entrypoint.sh
 ├─ .github/
-│  └─ workflows/
-│     └─ ci.yml
-├─ alembic/                      # migrations (si usas alembic)
-│  └─ versions/
+│  ├─ workflows/
+│  |  └─ ci.yml
+|  └──dependabot.yml
+├─ alembic/                       # migrations
+│  ├─ env.py
+|  └─ versions/
 ├─ src/
 │  └─ app/
 │     ├─ __init__.py
@@ -39,6 +43,7 @@ jdinbot/
 │     │  ├─ config.py
 │     │  └─ logging.py
 │     ├─ api/
+│     │  ├─ http.py
 │     │  └─ v1/
 │     │     ├─ routers.py
 │     │     └─ schemas.py
@@ -47,30 +52,42 @@ jdinbot/
 │     │  ├─ dispatcher.py
 │     │  ├─ commands.py
 │     │  ├─ handlers/
+│     │  │  ├─ __init__.py
+│     │  │  ├─ common.py
 │     │  │  ├─ start.py
 │     │  │  └─ admin.py
 │     │  ├─ middlewares.py
-│     │  └─ keyboards.py
+│     │  ├─ keyboards.py
+│     │  └─ bot.py
 │     ├─ db/
 │     │  ├─ base.py
 │     │  ├─ models/
+│     │  │  ├─ models.py.py
 │     │  │  └─ user.py
 │     │  ├─ session.py
+│     │  ├─ engine.py
 │     │  └─ crud.py
 │     ├─ services/
 │     │  └─ telegram_service.py
-│     ├─ tasks/                   # Celery / background tasks (si aplica)
+│     ├─ tasks/                   # Celery / background tasks
 │     └─ utils/
+│     │  ├─ money.py
 │        └─ helpers.py
 ├─ tests/
-│  └─ test_basic.py
+│  ├─ test_basic.py
+│  ├─ test_gamble.py
+│  └─ test_transfer.py
 ├─ scripts/
-│  └─ setup_db.sh
+│  ├─ build.sh
+|  └─ setup_db.sh
+├─ docker-compose.dev.yml
+├─ docker-compose.prod.yml
 ├─ docker-compose.yml
 ├─ Dockerfile
-├─ build.sh
 ├─ pyproject.toml
+├─ .env                           # ignored by git
 ├─ .env.example
+├─ .gitignore
 ├─ README.md
 ├─ LICENSE
 ├─ CONTRIBUTING.md
