@@ -57,6 +57,7 @@ jdinbot/
 ├─ docker-compose.prod.yml
 ├─ docker-compose.yml
 ├─ Dockerfile
+├─ Makefile
 ├─ pyproject.toml
 ├─ .env.example
 ├─ .gitignore
