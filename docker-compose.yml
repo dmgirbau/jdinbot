@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     restart: always
     environment:
-      POSTGRES_USER: jdin
-      POSTGRES_PASSWORD: jdin
-      POSTGRES_DB: jdin
+      POSTGRES_USER: dino
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: dino_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -16,9 +16,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+         APP_USER: "dino"
+         APP_UID: "1001"
+         APP_GID: "1001"
          PYTHON_VERSION: "3.13"
          POETRY_VERSION: "2.1.4"   # optional
-    image: jdinbot:latest
+    image: app:latest
     depends_on:
       - postgres
     env_file:

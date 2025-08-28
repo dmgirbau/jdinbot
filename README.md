@@ -2,6 +2,8 @@
 
 A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **PostgreSQL**. This project is designed both as a **learning project** (to explore professional-grade software practices) and as a **production-ready system** to power community interactions.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmgirbau/jdinbot)
+
 ## Features
 
 - Telegram bot built with [aiogram](https://docs.aiogram.dev)
@@ -67,7 +69,7 @@ This architecture ensures the application is:
 
 ### Quickstart (Development)
 
-1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, DATABASE_URL, ADMIN_CHAT_ID)
+1. Copy configuration: `cp .env.example .env` and fill values (TELEGRAM_TOKEN, WEBHOOK_SECRET_PATH, ENV, ADMIN_CHAT_ID, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
 2. Start dev environment (hot reload):  
    `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
 3. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
