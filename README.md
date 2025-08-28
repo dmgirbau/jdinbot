@@ -2,6 +2,8 @@
 
 A modern Telegram bot built with **Python**, **FastAPI**, **aiogram**, and **PostgreSQL**. This project is designed both as a **learning project** (to explore professional-grade software practices) and as a **production-ready system** to power community interactions.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmgirbau/jdinbot)
+
 ## Features
 
 - Telegram bot built with [aiogram](https://docs.aiogram.dev)
