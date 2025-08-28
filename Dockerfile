@@ -1,8 +1,8 @@
 
 # syntax=docker/dockerfile:1.4
 ARG PYTHON_VERSION=3.13
-ARG POETRY_VERSION=1.6.0
-ARG APP_USER=jdin
+ARG POETRY_VERSION=2.1.4
+ARG APP_USER=dino
 ARG APP_UID=1001
 ARG APP_GID=1001
 
@@ -31,11 +31,10 @@ WORKDIR /app
 # Copy only dependency manifests first for caching
 COPY pyproject.toml poetry.lock* /app/
 
-# Use BuildKit cache for Poetry caches (speeds up repeated builds)
+# Use BuildKit cache for Poetry and pip caches (speeds up repeated builds)
 RUN --mount=type=cache,target=/root/.cache/pypoetry \
     poetry config virtualenvs.create false \
- && --mount=type=cache,target=/root/.cache/pip \
-    poetry install --no-interaction --no-ansi --only main
+    && poetry install --no-interaction --no-ansi --only main
 
 # Copy rest of the project
 COPY . /app
