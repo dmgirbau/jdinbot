@@ -33,6 +33,7 @@ COPY pyproject.toml poetry.lock* /app/
 
 # Use BuildKit cache for Poetry and pip caches (speeds up repeated builds)
 RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    --mount=type=cache,target=/root/.cache/pip \
     poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --only main
 
@@ -68,13 +69,13 @@ COPY --from=builder /app /app
 # ensure ownership
 RUN chown -R ${APP_USER}:${APP_USER} /app
 
-# add a tiny entrypoint that handles signals
-COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# add a tiny entrypoint that handles signals (now in Python)
+COPY ./docker/entrypoint.py /usr/local/bin/entrypoint.py
+RUN chmod +x /usr/local/bin/entrypoint.py
 
 USER ${APP_USER}
 ENV HOME=/home/${APP_USER}
 
 EXPOSE 8000
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["python", "/usr/local/bin/entrypoint.py"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
