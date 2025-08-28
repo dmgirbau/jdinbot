@@ -145,6 +145,24 @@ We welcome contributions! Please:
 
 ## Roadmap
 
+JDINBot is designed as a layered system: minimal features today, professional scaffolding for growth tomorrow.
+
+- **M1 – Local MVP (Now)**  
+  Run the bot locally with Docker Compose.  
+  Features: `/start` command, `/balance`, persistent Postgres storage.  
+
+- **M2 – Core Features (Next)**  
+  Implement user economy: `/transfer`, admin commands (`/promote`, `/ban`).  
+  Add REST API endpoints (`/health`, `/users`).  
+
+- **M3 – Quality & Tooling (Soon)**  
+  Introduce automated linting, type-checking, and tests.  
+  Align dev and prod environments with Docker.  
+
+- **M4 – Scaling Up (Future)**  
+  Enable CI/CD pipelines, monitoring with Prometheus, contribution guidelines.  
+  Secure and professionalize infrastructure for multi-developer collaboration.  
+
 ### License
 
 This project is open-source under the MIT License.
