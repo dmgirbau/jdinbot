@@ -78,6 +78,7 @@ jdinbot/
 │       │       └── telegram.py  # Telegram API wrapper
 │       ├── db/                  # Database components
 │       │   ├── __init__.py
+│       │   ├── crud.py 
 │       │   ├── base.py          # Declarative base
 │       │   ├── session.py       # Async session factory
 │       │   ├── engine.py        # Database engine
@@ -131,10 +132,9 @@ jdinbot/
 │   ├── lint.sh                  # Linting script
 │   └── migrate.sh               # Database migration helper
 ├── docker-compose.yml           # Base docker-compose
-├── docker-compose.override.yml  # Development overrides
+├── docker-compose.dev.yml  # Development overrides
 ├── docker-compose.prod.yml      # Production configuration
 ├── Dockerfile                   # Multi-stage Dockerfile
-├── Dockerfile.dev               # Development Dockerfile
 ├── pyproject.toml               # Project configuration
 ├── .env.example                 # Environment variables template
 ├── .env                         # Local environment (gitignored)

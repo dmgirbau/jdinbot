@@ -69,13 +69,13 @@ COPY --from=builder /app /app
 # ensure ownership
 RUN chown -R ${APP_USER}:${APP_USER} /app
 
-# add a tiny entrypoint that handles signals (now in Python)
-COPY ./docker/entrypoint.py /usr/local/bin/entrypoint.py
-RUN chmod +x /usr/local/bin/entrypoint.py
+# add a tiny entrypoint that handles signals
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER ${APP_USER}
 ENV HOME=/home/${APP_USER}
 
 EXPOSE 8000
-ENTRYPOINT ["python", "/usr/local/bin/entrypoint.py"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
