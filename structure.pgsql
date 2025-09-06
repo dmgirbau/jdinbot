@@ -132,7 +132,7 @@ jdinbot/
 │   ├── lint.sh                  # Linting script
 │   └── migrate.sh               # Database migration helper
 ├── docker-compose.yml           # Base docker-compose
-├── docker-compose.dev.yml  # Development overrides
+├── docker-compose.dev.yml       # Development overrides
 ├── docker-compose.prod.yml      # Production configuration
 ├── Dockerfile                   # Multi-stage Dockerfile
 ├── pyproject.toml               # Project configuration

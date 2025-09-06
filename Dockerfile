@@ -49,11 +49,13 @@ FROM python:${PYTHON_VERSION}-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH=/home/${APP_USER}/.local/bin:$PATH
+    PATH=/home/${APP_USER}/.local/bin:$PATH \
+    APP_UID=${APP_UID} \
+    APP_GID=${APP_GID}
 
 # minimal runtime deps
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates \
+  && apt-get install -y --no-install-recommends ca-certificates su-exec \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user & group (use build args so CI can override if needed)

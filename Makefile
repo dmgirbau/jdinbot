@@ -16,4 +16,4 @@ logs:
 	docker compose logs -f web
 
 shell:
-	docker compose exec bot sh
+	docker compose exec -u ${UID:-1000}:${GID:-1000} bot sh
