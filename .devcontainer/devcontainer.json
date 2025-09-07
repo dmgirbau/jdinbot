@@ -1,51 +1,44 @@
 {
-	"name": "JDINBot Development",
-	"dockerComposeFile": [
-		"../docker-compose.yml"
-	],
-
-	"service": "bot",
-	"workspaceFolder": "/workspaces/jdinbot",
-	
-	"containerEnv": {
-    "DEV_MODE": "true",
-    "ENV": "development"
-  },
-
-	"features": {
-		"ghcr.io/devcontainers/features/git-lfs:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/python:1": {}
-	},
-	"forwardPorts": [8000, 5432],
-	"shutdownAction": "none",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"ms-python.black-formatter",
-				"ms-python.flake8",
-				"ms-python.isort",
-				"tamasfe.even-better-toml"
-			],
-			"settings": {
-				"python.defaultInterpreterPath": "/usr/local/bin/python",
-				"python.formatting.provider": "black",
-				"python.linting.enabled": true,
-				"python.linting.flake8Enabled": true,
-				"python.sortImports.args": [
-					"--profile",
-					"black"
-				],
-				"editor.formatOnSave": true,
-				"editor.codeActionsOnSave": {
-					"source.organizeImports": "explicit"
-				}
-			}
-		}
-	},
-	"postCreateCommand": "poetry install --with dev",
-	"remoteUser": "vscode",
-	"updateRemoteUserUID": true
+    "name": "JDINBot Development",
+    "dockerComposeFile": [
+        "../docker-compose.yml",
+        "../docker-compose.dev.yml"
+    ],
+    "service": "bot",
+    "workspaceFolder": "/workspaces/jdinbot",
+    "containerEnv": {
+        "DEV_MODE": "true",
+        "ENV": "development"
+    },
+    "forwardPorts": [8000, 5432],
+    "shutdownAction": "none",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-python.flake8",
+                "ms-python.isort",
+                "tamasfe.even-better-toml"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.formatting.provider": "black",
+                "python.linting.enabled": true,
+                "python.linting.flake8Enabled": true,
+                "python.sortImports.args": [
+                    "--profile",
+                    "black"
+                ],
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "explicit"
+                }
+            }
+        }
+    },
+    "postCreateCommand": "poetry install --with dev",
+    "remoteUser": "vscode",
+    "updateRemoteUserUID": true
 }
