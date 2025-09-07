@@ -28,8 +28,8 @@ RUN curl -sSL https://install.python-poetry.org | python3 - \
 
 WORKDIR /app
 
-# Copy only dependency manifests first for caching
-COPY pyproject.toml poetry.lock* /app/
+# Copy dependency manifests for caching, copy README and source code for editable installs
+COPY pyproject.toml poetry.lock* README.md src/ /app/
 
 # Use BuildKit cache for Poetry and pip caches (speeds up repeated builds)
 RUN --mount=type=cache,target=/root/.cache/pypoetry \
@@ -46,6 +46,9 @@ COPY . /app
 ### Runtime stage
 ########################
 FROM python:${PYTHON_VERSION}-slim AS runtime
+ARG APP_USER
+ARG APP_UID
+ARG APP_GID
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
