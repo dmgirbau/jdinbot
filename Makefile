@@ -1,4 +1,4 @@
-.PHONY: build up down dev prod logs shell
+.PHONY: build up down dev prod logs shell migrate test
 
 build:
 	docker compose -f docker-compose.yml build
@@ -17,3 +17,9 @@ logs:
 
 shell:
 	docker compose exec -u ${UID:-1000}:${GID:-1000} bot sh
+
+migrate:
+	docker compose exec bot alembic upgrade head
+
+test:
+	docker compose exec bot pytest	

@@ -24,9 +24,11 @@ jdinbot/
 │       └── init-db.sh           # Database initialization
 ├── docs/                         # Project documentation
 │   ├── api/                     # API documentation
-│   ├── development.md
-│   ├── deployment.md
-│   └── architecture.md
+│   │   ├── index.rst  
+│   │   └── health.rst                   
+│   ├── development.rst
+│   ├── deployment.rst
+│   └── architecture.rst
 ├── src/                          # Source code
 │   └── jdinbot/                 # Package name matches project (better practice)
 │       ├── __init__.py
@@ -116,12 +118,14 @@ jdinbot/
 │   ├── conftest.py              # pytest fixtures
 │   ├── unit/                    # Unit tests
 │   │   ├── __init__.py
+│   │   ├── test_bot_start.py
 │   │   ├── test_models.py
 │   │   ├── test_services.py
 │   │   └── test_utils.py
 │   ├── integration/             # Integration tests
 │   │   ├── __init__.py
 │   │   ├── test_api.py
+│   │   ├── test_db.py
 │   │   └── test_bot.py
 │   └── e2e/                     # End-to-end tests
 │       └── __init__.py

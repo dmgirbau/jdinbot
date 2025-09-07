@@ -33,7 +33,7 @@ JDINBot is built with a modern, scalable architecture designed for high performa
 - **Docker Compose** for local development and production deployments
 - **VS Code DevContainers** for consistent development environments
 - **Alembic** for database migrations with autogenerate support
-- **Structlog** for structured, production-ready logging
+- **Structlog** for structured, production-ready logging with JSON output in production and detailed error logging for database connectivity issues
 - **Prometheus** integration for metrics and monitoring
 
 ### Code Quality & Security
@@ -71,10 +71,13 @@ This architecture ensures the application is:
 
 ### Quickstart (Development)
 
+- `POSTGRES_PORT`: The port for the PostgreSQL service (default: 5432). In development, this port is exposed on the host. In production, consider not exposing it for security.
+
 1. Copy configuration: `cp .env.example .env` and fill values for `TELEGRAM_TOKEN`, `WEBHOOK_SECRET_PATH`, `ENV`, `ADMIN_CHAT_ID`, `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
 2. Start dev environment (hot reload):  
    `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
-3. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
+3. The bot service will wait for the PostgreSQL database to be ready before starting.
+4. Visit the REST API at `http://localhost:8000` and your bot in Telegram.
 
 ### Quickstart (Production)
 
@@ -82,6 +85,7 @@ This architecture ensures the application is:
    `docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d`
 2. Apply database migrations:
    `docker compose exec bot alembic upgrade head`
+3. The bot service will wait for the PostgreSQL database to be ready before starting.
 
 ### VS Code DevContainer
 
@@ -140,6 +144,7 @@ We welcome contributions! Please:
 ### FAQ / Troubleshooting
 
 - If you get permission issues when mounting code in dev, set `UID`/`GID` env vars (e.g. `export UID=$(id -u) GID=$(id -g)`).
+- **Database connection issues**: Check the `bot` service logs (`docker compose logs bot`) for structured error messages if the application fails to connect to PostgreSQL. Ensure `.env` variables (`POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`) are correctly set.
 
 ### Community & Governance
 

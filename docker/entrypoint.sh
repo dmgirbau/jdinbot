@@ -2,6 +2,12 @@
 # simple entrypoint: propagate signals and run the command
 
 set -e
+for var in POSTGRES_HOST POSTGRES_PORT POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB; do
+  if [ -z "${!var}" ]; then
+    echo "Error: $var is not set"
+    exit 1
+  fi
+done
 
 # if mounted volume changed ownership, ensure /app is writable by the runtime user
 APP_UID=${APP_UID:-1001}

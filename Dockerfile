@@ -55,7 +55,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # minimal runtime deps
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates su-exec \
+  && apt-get install -y --no-install-recommends ca-certificates su-exec netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user & group (use build args so CI can override if needed)
@@ -74,6 +74,10 @@ RUN chown -R ${APP_USER}:${APP_USER} /app
 # add a tiny entrypoint that handles signals
 COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Health check for FastAPI /health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl --fail http://localhost:8000/health || exit 1
 
 USER ${APP_USER}
 ENV HOME=/home/${APP_USER}
