@@ -55,7 +55,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # minimal runtime deps
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates su-exec netcat-openbsd \
+  && apt-get install -y --no-install-recommends ca-certificates gosu netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user & group (use build args so CI can override if needed)

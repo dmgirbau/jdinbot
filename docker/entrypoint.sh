@@ -16,7 +16,7 @@ APP_GID=${APP_GID:-1001}
 if [ "$(id -u)" = "0" ]; then
   chown -R ${APP_UID}:${APP_GID} /app || true
   # exec is used for signal handling
-  exec su-exec ${APP_USER} "$@"
+  exec gosu ${APP_USER} "$@"
 fi
 
 exec "$@"
