@@ -39,6 +39,6 @@
         }
     },
     "postCreateCommand": "poetry install --with dev",
-    "remoteUser": "vscode",
+    "remoteUser": "dino",
     "updateRemoteUserUID": true
 }
