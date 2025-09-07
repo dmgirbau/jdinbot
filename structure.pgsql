@@ -24,9 +24,11 @@ jdinbot/
 │       └── init-db.sh           # Database initialization
 ├── docs/                         # Project documentation
 │   ├── api/                     # API documentation
-│   ├── development.md
-│   ├── deployment.md
-│   └── architecture.md
+│   │   ├── index.rst  
+│   │   └── health.rst                   
+│   ├── development.rst
+│   ├── deployment.rst
+│   └── architecture.rst
 ├── src/                          # Source code
 │   └── jdinbot/                 # Package name matches project (better practice)
 │       ├── __init__.py
@@ -78,6 +80,7 @@ jdinbot/
 │       │       └── telegram.py  # Telegram API wrapper
 │       ├── db/                  # Database components
 │       │   ├── __init__.py
+│       │   ├── crud.py 
 │       │   ├── base.py          # Declarative base
 │       │   ├── session.py       # Async session factory
 │       │   ├── engine.py        # Database engine
@@ -115,12 +118,14 @@ jdinbot/
 │   ├── conftest.py              # pytest fixtures
 │   ├── unit/                    # Unit tests
 │   │   ├── __init__.py
+│   │   ├── test_bot_start.py
 │   │   ├── test_models.py
 │   │   ├── test_services.py
 │   │   └── test_utils.py
 │   ├── integration/             # Integration tests
 │   │   ├── __init__.py
 │   │   ├── test_api.py
+│   │   ├── test_db.py
 │   │   └── test_bot.py
 │   └── e2e/                     # End-to-end tests
 │       └── __init__.py
@@ -131,10 +136,9 @@ jdinbot/
 │   ├── lint.sh                  # Linting script
 │   └── migrate.sh               # Database migration helper
 ├── docker-compose.yml           # Base docker-compose
-├── docker-compose.override.yml  # Development overrides
+├── docker-compose.dev.yml       # Development overrides
 ├── docker-compose.prod.yml      # Production configuration
 ├── Dockerfile                   # Multi-stage Dockerfile
-├── Dockerfile.dev               # Development Dockerfile
 ├── pyproject.toml               # Project configuration
 ├── .env.example                 # Environment variables template
 ├── .env                         # Local environment (gitignored)

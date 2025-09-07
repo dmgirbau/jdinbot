@@ -5,9 +5,11 @@ services:
         # In dev builds you can install dev deps by passing an arg, or simply rely on volume-mounted host venv
         POETRY_INSTALL_DEV: "true"
     volumes:
-      - ./:/app:cached
+      - ./:/jdinbot:cached
     environment:
-      - PYTHONPATH=/app/src
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+      - PYTHONPATH=/jdinbot/src
+    command: >
+      /bin/sh -c "./docker/scripts/wait-for-it.sh ${POSTGRES_HOST}:${POSTGRES_PORT} --timeout=30 --strict -- uvicorn jdinbot.main:jdinbot --reload --host 0.0.0.0 --port 8000"
     # map host UID/GID to container (keeps file permissions correct)
     user: "${UID:-1000}:${GID:-1000}"
+    

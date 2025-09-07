@@ -28,8 +28,8 @@ RUN curl -sSL https://install.python-poetry.org | python3 - \
 
 WORKDIR /app
 
-# Copy only dependency manifests first for caching
-COPY pyproject.toml poetry.lock* /app/
+# Copy dependency manifests for caching, copy README and source code for editable installs
+COPY pyproject.toml poetry.lock* README.md src/ /app/
 
 # Use BuildKit cache for Poetry and pip caches (speeds up repeated builds)
 RUN --mount=type=cache,target=/root/.cache/pypoetry \
@@ -46,14 +46,19 @@ COPY . /app
 ### Runtime stage
 ########################
 FROM python:${PYTHON_VERSION}-slim AS runtime
+ARG APP_USER
+ARG APP_UID
+ARG APP_GID
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH=/home/${APP_USER}/.local/bin:$PATH
+    PATH=/home/${APP_USER}/.local/bin:$PATH \
+    APP_UID=${APP_UID} \
+    APP_GID=${APP_GID}
 
 # minimal runtime deps
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates \
+  && apt-get install -y --no-install-recommends ca-certificates gosu netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user & group (use build args so CI can override if needed)
@@ -69,13 +74,17 @@ COPY --from=builder /app /app
 # ensure ownership
 RUN chown -R ${APP_USER}:${APP_USER} /app
 
-# add a tiny entrypoint that handles signals (now in Python)
-COPY ./docker/entrypoint.py /usr/local/bin/entrypoint.py
-RUN chmod +x /usr/local/bin/entrypoint.py
+# add a tiny entrypoint that handles signals
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Health check for FastAPI /health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl --fail http://localhost:8000/health || exit 1
 
 USER ${APP_USER}
 ENV HOME=/home/${APP_USER}
 
 EXPOSE 8000
-ENTRYPOINT ["python", "/usr/local/bin/entrypoint.py"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

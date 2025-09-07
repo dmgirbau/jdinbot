@@ -1,0 +1,201 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry --version
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --with dev --no-interaction
+
+      - name: Run Ruff (linting and formatting check)
+        run: poetry run ruff check .
+
+      - name: Run Black (formatting check)
+        run: poetry run black --check --diff .
+
+      - name: Run Mypy (type checking)
+        run: poetry run mypy .
+
+      - name: Run Bandit (security scanning)
+        run: poetry run bandit -r src -c pyproject.toml
+
+  test:
+    name: Unit and Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jdinbot
+          POSTGRES_PASSWORD: jdinbot
+          POSTGRES_DB: jdinbot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jdinbot -d jdinbot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry --version
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --with dev --no-interaction
+
+      - name: Run database migrations
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: jdinbot
+          POSTGRES_PASSWORD: jdinbot
+          POSTGRES_DB: jdinbot
+        run: poetry run alembic upgrade head
+
+      - name: Run pytest with coverage
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: jdinbot
+          POSTGRES_PASSWORD: jdinbot
+          POSTGRES_DB: jdinbot
+        run: poetry run pytest --cov=src/jdinbot --cov-report=xml tests/
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }} # Optional, if using Codecov
+
+  docker:
+    name: Build and Test Docker Image
+    runs-on: ubuntu-latest
+    needs: [lint, test] # Ensure lint and test pass before building Docker
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jdinbot
+          POSTGRES_PASSWORD: jdinbot
+          POSTGRES_DB: jdinbot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jdinbot -d jdinbot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ hashFiles('Dockerfile', 'pyproject.toml', 'poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker image
+        run: |
+          docker buildx build \
+            --build-arg PYTHON_VERSION=3.13 \
+            --build-arg POETRY_VERSION=2.1.4 \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache \
+            -t jdinbot:test .
+
+      - name: Run Docker container for testing
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: jdinbot
+          POSTGRES_PASSWORD: jdinbot
+          POSTGRES_DB: jdinbot
+          ENV: test
+        run: |
+          docker run --rm \
+            --network host \
+            -e POSTGRES_HOST=${POSTGRES_HOST} \
+            -e POSTGRES_PORT=${POSTGRES_PORT} \
+            -e POSTGRES_USER=${POSTGRES_USER} \
+            -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+            -e POSTGRES_DB=${POSTGRES_DB} \
+            -e ENV=${ENV} \
+            jdinbot:test \
+            /bin/sh -c "./docker/scripts/wait-for-it.sh ${POSTGRES_HOST}:${POSTGRES_PORT} --timeout=30 --strict -- alembic upgrade head && pytest tests/"
+
+      - name: Verify Docker container health
+        run: |
+          docker run -d --name jdinbot-test \
+            --network host \
+            -e POSTGRES_HOST=postgres \
+            -e POSTGRES_PORT=5432 \
+            -e POSTGRES_USER=jdinbot \
+            -e POSTGRES_PASSWORD=jdinbot \
+            -e POSTGRES_DB=jdinbot \
+            -e ENV=test \
+            jdinbot:test
+          sleep 10
+          docker inspect jdinbot-test --format='{{.State.Health.Status}}' | grep healthy
+          docker stop jdinbot-test
